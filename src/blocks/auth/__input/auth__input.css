@@ -1,0 +1,16 @@
+.auth__input {
+  width: 100%;
+  padding: 13px 0 13px 0;
+  box-sizing: border-box;
+  border: none;
+  background: transparent;
+  border-bottom: 2px solid var(--dim-white);
+  font: 400 14px/17px 'Inter', arial, sans-serif;
+  color: var(--dim-white);
+  margin-bottom: 17px;
+  outline: none;
+}
+
+.auth__input:nth-child(2) {
+  margin-bottom: 216px;
+}

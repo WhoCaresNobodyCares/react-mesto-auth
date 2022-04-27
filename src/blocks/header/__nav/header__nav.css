@@ -1,0 +1,11 @@
+.header__nav {
+  font: 400 18px/22px 'Inter', arial, sans-serif;
+  color: var(--white);
+  text-decoration: none;
+  transition: opacity 0.2s ease-out;
+  margin-left: 8px;
+}
+
+.header__nav:hover {
+  opacity: 0.6;
+}

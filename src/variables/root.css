@@ -5,7 +5,9 @@
   --black-transparent-submit: rgba(0, 0, 0, 0.8);
   --black-transparent-modal: rgba(0, 0, 0, 0.9);
   --white: #fff;
+  --white-transparent: rgba(255, 255, 255, 0.85);
   --grey: #545454;
   --grey-transparent: rgba(33%, 33%, 33%, 0.7);
   --error: #f00;
+  --dim-white: #cccccc;
 }

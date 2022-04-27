@@ -1,5 +1,4 @@
 import React from 'react';
-
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
@@ -10,6 +9,10 @@ import UserContext from '../contexts/CurrentUserContext';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
+import { Routes, Route, Link } from 'react-router-dom';
+import SignUp from './SignUp';
+import SignIn from './SignIn';
+import NotFound from './NotFound';
 
 function App() {
   const [cards, setCards] = React.useState([]);
@@ -92,15 +95,25 @@ function App() {
     <UserContext.Provider value={currentUser}>
       <div className='body'>
         <Header />
-        <Main
-          onEditAvatar={handleEditAvatarClick}
-          onEditProfile={handleEditProfileClick}
-          onAddPlace={handleAddPlaceClick}
-          onCardClick={handleCardClick}
-          cards={cards}
-          onCardLike={handleCardLike}
-          onCardDelete={handleCardDelete}
-        />
+        <Routes>
+          <Route
+            path='/'
+            element={
+              <Main
+                onEditAvatar={handleEditAvatarClick}
+                onEditProfile={handleEditProfileClick}
+                onAddPlace={handleAddPlaceClick}
+                onCardClick={handleCardClick}
+                cards={cards}
+                onCardLike={handleCardLike}
+                onCardDelete={handleCardDelete}
+              />
+            }
+          />
+          <Route path='/sign-up' element={<SignUp />} />
+          <Route path='/sign-in' element={<SignIn />} />
+          <Route path='*' element={<NotFound />} />
+        </Routes>
         <Footer />
 
         <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />

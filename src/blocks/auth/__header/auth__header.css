@@ -1,0 +1,6 @@
+.auth__header {
+  margin: 20px auto 37px auto;
+  color: var(--white);
+  text-align: center;
+  font: 900 24px/29px 'Inter', arial, sans-serif;
+}

@@ -1,0 +1,5 @@
+.auth__text {
+  font: 400 18px/21px 'Inter', arial, sans-serif;
+  color: var(--white);
+  margin-bottom: 80px;
+}
