@@ -1,13 +1,37 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const SignUp = () => {
+const SignUp = props => {
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
+  const handleSignUp = e => {
+    e.preventDefault();
+    props.onSignup(password, email);
+  };
+
+  function handleEmailChange(e) {
+    setEmail(e.target.value);
+  }
+
+  function handlePasswordChange(e) {
+    setPassword(e.target.value);
+  }
+
   return (
     <div className='auth'>
       <h2 className='auth__header'>Регистрация</h2>
-      <form className='auth__form' id='signup-form' action='#' method='post' name='signup-form'>
-        <input className='auth__input' type='url' name='email' id='email' placeholder='Email' required />
-        <input className='auth__input' type='password' name='signup-password' id='signup-password' placeholder='Пароль' required />
+      <form className='auth__form' id='signup-form' action='#' method='post' name='signup-form' onSubmit={handleSignUp}>
+        <input className='auth__input' type='email' name='email' id='email' placeholder='Email' onChange={handleEmailChange} required />
+        <input
+          className='auth__input'
+          type='password'
+          name='signup-password'
+          id='signup-password'
+          placeholder='Пароль'
+          onChange={handlePasswordChange}
+          required
+        />
         <button className='auth__button' type='submit'>
           Зарегистрироваться
         </button>

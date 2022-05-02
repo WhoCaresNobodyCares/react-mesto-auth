@@ -1,0 +1,6 @@
+.popup__description {
+  color: var(--background);
+  font: 900 24px/29px 'Inter', arial, sans-serif;
+  text-align: center;
+  margin: 0;
+}

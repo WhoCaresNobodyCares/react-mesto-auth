@@ -9,10 +9,14 @@ import UserContext from '../contexts/CurrentUserContext';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import SignUp from './SignUp';
 import SignIn from './SignIn';
 import ProtectedRoute from './ProtectedRoute';
+import InfoToolTip from './InfoToolTip';
+
+import imgCorrectPath from '../images/Union.svg';
+import imgWrongPath from '../images/False.svg';
 
 function App() {
   const [cards, setCards] = React.useState([]);
@@ -22,7 +26,12 @@ function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({ name: '', link: '' });
 
+  const [isInfoToolTipPopupOpen, setIsInfoToolTipPopupOpen] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [imgPath, setImgPath] = React.useState('');
+  const [title, setTitle] = React.useState('');
+  const [user, setUser] = React.useState('');
+  const nav = useNavigate();
 
   const handleEditAvatarClick = () => setIsEditAvatarPopupOpen(true);
   const handleEditProfileClick = () => setIsEditProfilePopupOpen(true);
@@ -38,12 +47,21 @@ function App() {
       .getArray()
       .then(array => setCards(array))
       .catch(error => console.log(`WASTED - ${error}`));
-  }, []);
+    api.checkValidity().then(res => {
+      console.log(res);
+      if (res) {
+        setUser(res.data.email);
+        setIsLoggedIn(true);
+        nav('/');
+      }
+    });
+  }, [isLoggedIn]);
 
   const closeAllPopups = () => {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
+    setIsInfoToolTipPopupOpen(false);
     setSelectedCard({ name: '', link: '' });
   };
 
@@ -93,10 +111,58 @@ function App() {
       .catch(error => console.log(`WASTED - ${error}`));
   }
 
+  // killahill@gmail.com
+  // 1234
+
+  function handleSignUp(password, email) {
+    api
+      .signup(password, email)
+      .then(res => {
+        console.log(res.data);
+        localStorage.setItem('id', `${res.data._id}`);
+      })
+      .then(res => {
+        console.log(res);
+        setImgPath(imgCorrectPath);
+        setTitle('Вы успешно зарегистрировались!');
+        setIsInfoToolTipPopupOpen(true);
+      })
+      .then(() => nav('sign-in'))
+      .catch(error => {
+        setImgPath(imgWrongPath);
+        setTitle('Что-то пошло не так! Попробуйте еще раз.');
+        setIsInfoToolTipPopupOpen(true);
+        console.log(`Signup error - ${error}`);
+      });
+  }
+
+  function handleSignIn(password, email) {
+    api
+      .signin(password, email)
+      .then(res => {
+        if (res.token) {
+          console.log(res);
+          localStorage.setItem('token', `${res.token}`);
+          setIsLoggedIn(true);
+          nav('/');
+        }
+      })
+      .catch(error => {
+        setImgPath(imgWrongPath);
+        setTitle('Данный пользователь не зарегистрирован.');
+        setIsInfoToolTipPopupOpen(true);
+        console.log(`Signup error - ${error}`);
+      });
+  }
+
+  function unlogin() {
+    setIsLoggedIn(false);
+  }
+
   return (
     <UserContext.Provider value={currentUser}>
       <div className='body'>
-        <Header />
+        <Header email={user} unlogin={unlogin} />
         <Routes>
           <Route path='/' element={<ProtectedRoute isLoggedIn={isLoggedIn} />}>
             <Route
@@ -114,8 +180,8 @@ function App() {
               }
             />
           </Route>
-          <Route path='sign-up' element={<SignUp />} />
-          <Route path='sign-in' element={<SignIn />} />
+          <Route path='sign-up' element={<SignUp onSignup={handleSignUp} />} />
+          <Route path='sign-in' element={<SignIn onSignin={handleSignIn} />} />
         </Routes>
 
         <Footer />
@@ -123,6 +189,8 @@ function App() {
         <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
         <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onUpdateCards={handleAddPlaceSubmit} />
         <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} />
+
+        <InfoToolTip isOpen={isInfoToolTipPopupOpen} onClose={closeAllPopups} image={imgPath} title={title} />
 
         <PopupWithForm id='confirmPopup' title='Вы уверены?' formName='confirmForm' formId='confirmPopupForm' buttonText='Да'></PopupWithForm>
 

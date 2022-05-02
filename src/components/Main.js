@@ -1,6 +1,5 @@
 import React from 'react';
 
-import api from '../utils/Api';
 import Card from './Card';
 
 import UserContext from '../contexts/CurrentUserContext';

@@ -1,9 +1,10 @@
 import apiConfig from './variables';
 
 class Api {
-  constructor(url, token) {
+  constructor(url, token, baseUrl) {
     this._url = url;
     this._token = token;
+    this._baseUrl = baseUrl;
   }
 
   _handleResponse(response) {
@@ -14,13 +15,9 @@ class Api {
     }
   }
 
-  // ---
-
   getAllInfo() {
     return Promise.all([this.getUserInfo(), this.getArray()]);
   }
-
-  // ---
 
   getUserInfo() {
     return fetch(`${this._url}/users/me`, {
@@ -35,8 +32,6 @@ class Api {
       headers: { authorization: this._token },
     }).then(response => this._handleResponse(response));
   }
-
-  // ---
 
   setInfo(name, about) {
     return fetch(`${this._url}/users/me`, {
@@ -82,7 +77,32 @@ class Api {
       body: JSON.stringify({ avatar: avatar }),
     }).then(response => this._handleResponse(response));
   }
+
+  // !!! NEW
+
+  signup(password, email) {
+    return fetch(`${this._baseUrl}/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: password, email: email }),
+    }).then(res => this._handleResponse(res));
+  }
+
+  signin(password, email) {
+    return fetch(`${this._baseUrl}/signin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: password, email: email }),
+    }).then(res => this._handleResponse(res));
+  }
+
+  checkValidity() {
+    return fetch(`${this._baseUrl}/users/me`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', authorization: `Bearer ${localStorage.getItem('token')}` },
+    }).then(res => this._handleResponse(res));
+  }
 }
 
-const api = new Api(apiConfig.url, apiConfig.token);
+const api = new Api(apiConfig.url, apiConfig.token, apiConfig.baseUrl);
 export default api;

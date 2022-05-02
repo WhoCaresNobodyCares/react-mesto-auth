@@ -1,0 +1,5 @@
+.header__user {
+  font: 400 18px/22px 'Inter', arial, sans-serif;
+  color: var(--white);
+  margin-right: 24px;
+}
