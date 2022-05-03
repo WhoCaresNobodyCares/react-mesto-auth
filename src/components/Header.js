@@ -1,15 +1,8 @@
 import React from 'react';
-import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+import { Link, Route, Routes } from 'react-router-dom';
 import logoPath from '../images/header__logo.svg';
 
 const Header = props => {
-  const nav = useNavigate();
-
-  function logOut() {
-    props.unlogin();
-    localStorage.removeItem('token');
-    nav('/');
-  }
   return (
     <header className='header body__header'>
       <a href='#' className='header__link'>
@@ -37,7 +30,7 @@ const Header = props => {
           element={
             <div>
               <span className='header__user'>{props.email}</span>
-              <button className='header__logout' onClick={logOut}>
+              <button className='header__logout' onClick={props.logout}>
                 Выйти
               </button>
             </div>

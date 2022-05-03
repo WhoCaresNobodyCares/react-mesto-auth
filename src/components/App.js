@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
@@ -19,18 +19,18 @@ import imgCorrectPath from '../images/Union.svg';
 import imgWrongPath from '../images/False.svg';
 
 function App() {
-  const [cards, setCards] = React.useState([]);
-  const [currentUser, setCurrentUser] = React.useState({});
-  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
-  const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
-  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
-  const [selectedCard, setSelectedCard] = React.useState({ name: '', link: '' });
+  const [cards, setCards] = useState([]);
+  const [currentUser, setCurrentUser] = useState({});
+  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+  const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
+  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState({ name: '', link: '' });
 
-  const [isInfoToolTipPopupOpen, setIsInfoToolTipPopupOpen] = React.useState(false);
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [imgPath, setImgPath] = React.useState('');
-  const [title, setTitle] = React.useState('');
-  const [user, setUser] = React.useState('');
+  const [isInfoToolTipPopupOpen, setIsInfoToolTipPopupOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [imgPath, setImgPath] = useState('');
+  const [title, setTitle] = useState('');
+  const [email, setEmail] = useState('');
   const nav = useNavigate();
 
   const handleEditAvatarClick = () => setIsEditAvatarPopupOpen(true);
@@ -38,23 +38,26 @@ function App() {
   const handleAddPlaceClick = () => setIsAddPlacePopupOpen(true);
   const handleCardClick = card => setSelectedCard({ name: card.name, link: card.link });
 
-  React.useEffect(() => {
+  useEffect(() => {
     api
       .getUserInfo()
       .then(userData => setCurrentUser(userData))
       .catch(error => console.log(`WASTED - ${error}`));
+
     api
       .getArray()
       .then(array => setCards(array))
       .catch(error => console.log(`WASTED - ${error}`));
-    api.checkValidity().then(res => {
-      console.log(res);
-      if (res) {
-        setUser(res.data.email);
-        setIsLoggedIn(true);
-        nav('/');
-      }
-    });
+
+    if (localStorage.getItem('token')) {
+      api.checkValidity(localStorage.getItem('token')).then(res => {
+        if (res) {
+          setEmail(res.data.email);
+          setIsLoggedIn(true);
+          nav('/');
+        }
+      });
+    }
   }, [isLoggedIn]);
 
   const closeAllPopups = () => {
@@ -81,17 +84,23 @@ function App() {
       .catch(error => console.log(`WASTED - ${error}`));
   }
 
+  function handleResponse(card) {
+    setCards(state => state.map(c => (c._id === card._id ? card : c)));
+  }
+
   function handleCardLike(card) {
     const isLiked = card.likes.some(item => item._id === currentUser._id);
     if (!isLiked) {
       api
         .putLike(card._id)
-        .then(likedCard => setCards(state => state.map(c => (c._id === card._id ? likedCard : c))))
+        .then(likedCard => handleResponse(likedCard))
+        // .then(likedCard => setCards(state => state.map(c => (c._id === card._id ? likedCard : c))))
         .catch(error => console.log(`WASTED - ${error}`));
     } else {
       api
         .removeLike(card._id)
-        .then(unlikedCard => setCards(state => state.map(c => (c._id === card._id ? unlikedCard : c))))
+        .then(unlikedCard => handleResponse(unlikedCard))
+        // .then(unlikedCard => setCards(state => state.map(c => (c._id === card._id ? unlikedCard : c))))
         .catch(error => console.log(`WASTED - ${error}`));
     }
   }
@@ -118,11 +127,7 @@ function App() {
     api
       .signup(password, email)
       .then(res => {
-        console.log(res.data);
         localStorage.setItem('id', `${res.data._id}`);
-      })
-      .then(res => {
-        console.log(res);
         setImgPath(imgCorrectPath);
         setTitle('Вы успешно зарегистрировались!');
         setIsInfoToolTipPopupOpen(true);
@@ -155,16 +160,37 @@ function App() {
       });
   }
 
-  function unlogin() {
+  function logout() {
     setIsLoggedIn(false);
+    localStorage.removeItem('token');
+    nav('/');
   }
 
   return (
     <UserContext.Provider value={currentUser}>
       <div className='body'>
-        <Header email={user} unlogin={unlogin} />
+        <Header email={email} logout={logout} />
         <Routes>
-          <Route path='/' element={<ProtectedRoute isLoggedIn={isLoggedIn} />}>
+          <Route
+            path='/'
+            element={
+              <ProtectedRoute
+                isLoggedIn={isLoggedIn}
+                element={
+                  <Main
+                    onEditAvatar={handleEditAvatarClick}
+                    onEditProfile={handleEditProfileClick}
+                    onAddPlace={handleAddPlaceClick}
+                    onCardClick={handleCardClick}
+                    cards={cards}
+                    onCardLike={handleCardLike}
+                    onCardDelete={handleCardDelete}
+                  />
+                }
+              />
+            }
+          />
+          {/* <Route path='/' element={<ProtectedRoute isLoggedIn={isLoggedIn} />}>
             <Route
               index
               element={
@@ -179,7 +205,7 @@ function App() {
                 />
               }
             />
-          </Route>
+          </Route> */}
           <Route path='sign-up' element={<SignUp onSignup={handleSignUp} />} />
           <Route path='sign-in' element={<SignIn onSignin={handleSignIn} />} />
         </Routes>

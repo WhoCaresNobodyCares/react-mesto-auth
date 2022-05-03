@@ -96,10 +96,10 @@ class Api {
     }).then(res => this._handleResponse(res));
   }
 
-  checkValidity() {
+  checkValidity(token) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json', authorization: `Bearer ${localStorage.getItem('token')}` },
+      headers: { 'Content-Type': 'application/json', authorization: `Bearer ${token}` },
     }).then(res => this._handleResponse(res));
   }
 }

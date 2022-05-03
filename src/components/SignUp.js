@@ -22,7 +22,16 @@ const SignUp = props => {
     <div className='auth'>
       <h2 className='auth__header'>Регистрация</h2>
       <form className='auth__form' id='signup-form' action='#' method='post' name='signup-form' onSubmit={handleSignUp}>
-        <input className='auth__input' type='email' name='email' id='email' placeholder='Email' onChange={handleEmailChange} required />
+        <input
+          className='auth__input'
+          type='email'
+          name='email'
+          id='email'
+          placeholder='Email'
+          onChange={handleEmailChange}
+          value={email || ''}
+          required
+        />
         <input
           className='auth__input'
           type='password'
@@ -30,6 +39,7 @@ const SignUp = props => {
           id='signup-password'
           placeholder='Пароль'
           onChange={handlePasswordChange}
+          value={password || ''}
           required
         />
         <button className='auth__button' type='submit'>
